@@ -1,0 +1,6 @@
+framework module GLTFSCN {
+  umbrella header "GLTFSCN.h"
+
+  export *
+  module * { export * }
+}

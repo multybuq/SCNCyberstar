@@ -54,6 +54,7 @@ class Node: SCNNode {
         if let animation = animation {
             animation.forEach { (pair) in
                 //pair.target.isPaused = false
+                print(pair.animation.autoreverses);
                 pair.target.animationKeys.forEach { (key) in
                     pair.target.animationPlayer(forKey: key)?.paused = false
                 }

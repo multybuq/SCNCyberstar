@@ -26,6 +26,15 @@
 		6383CE0F2385D40100A69B08 /* GLTFSCN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6383CE0C2385D40100A69B08 /* GLTFSCN.framework */; };
 		6383CE102385D40100A69B08 /* GLTFSCN.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6383CE0C2385D40100A69B08 /* GLTFSCN.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6383CE132385D99B00A69B08 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6383CE122385D99B00A69B08 /* Node.swift */; };
+		63B81798238D959B006846C8 /* MetalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B81797238D959B006846C8 /* MetalViewController.swift */; };
+		63B8179D238D9684006846C8 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B8179A238D9684006846C8 /* Renderer.swift */; };
+		63B8179E238D9684006846C8 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 63B8179B238D9684006846C8 /* Shaders.metal */; };
+		63B817D1238EECD8006846C8 /* GLTFMTLUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B817CB238EECD8006846C8 /* GLTFMTLUtilities.m */; };
+		63B817D2238EECD8006846C8 /* GLTFMTLRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B817CC238EECD8006846C8 /* GLTFMTLRenderer.m */; };
+		63B817D3238EECD8006846C8 /* GLTFMTLLightingEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B817CD238EECD8006846C8 /* GLTFMTLLightingEnvironment.m */; };
+		63B817D4238EECD8006846C8 /* GLTFMTLTextureLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B817CE238EECD8006846C8 /* GLTFMTLTextureLoader.m */; };
+		63B817D5238EECD8006846C8 /* GLTFMTLShaderBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B817CF238EECD8006846C8 /* GLTFMTLShaderBuilder.m */; };
+		63B817D6238EECD8006846C8 /* GLTFMTLBufferAllocator.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B817D0238EECD8006846C8 /* GLTFMTLBufferAllocator.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -63,6 +72,24 @@
 		6383CE0B2385D40100A69B08 /* GLTF.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GLTF.framework; sourceTree = "<group>"; };
 		6383CE0C2385D40100A69B08 /* GLTFSCN.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GLTFSCN.framework; sourceTree = "<group>"; };
 		6383CE122385D99B00A69B08 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
+		63B81797238D959B006846C8 /* MetalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalViewController.swift; sourceTree = "<group>"; };
+		63B8179A238D9684006846C8 /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		63B8179B238D9684006846C8 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		63B8179F238D9874006846C8 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		63B817A0238D9892006846C8 /* SCN-Cyberstar-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SCN-Cyberstar-Bridging-Header.h"; sourceTree = "<group>"; };
+		63B817C4238EECD8006846C8 /* GLTFMTLShaderBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLTFMTLShaderBuilder.h; sourceTree = "<group>"; };
+		63B817C5238EECD8006846C8 /* GLTFMTLTextureLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLTFMTLTextureLoader.h; sourceTree = "<group>"; };
+		63B817C6238EECD8006846C8 /* GLTFMTLBufferAllocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLTFMTLBufferAllocator.h; sourceTree = "<group>"; };
+		63B817C7238EECD8006846C8 /* GLTFMTLUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLTFMTLUtilities.h; sourceTree = "<group>"; };
+		63B817C8238EECD8006846C8 /* GLTFMTLRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLTFMTLRenderer.h; sourceTree = "<group>"; };
+		63B817C9238EECD8006846C8 /* GLTFMTLLightingEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLTFMTLLightingEnvironment.h; sourceTree = "<group>"; };
+		63B817CB238EECD8006846C8 /* GLTFMTLUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLTFMTLUtilities.m; sourceTree = "<group>"; };
+		63B817CC238EECD8006846C8 /* GLTFMTLRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLTFMTLRenderer.m; sourceTree = "<group>"; };
+		63B817CD238EECD8006846C8 /* GLTFMTLLightingEnvironment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLTFMTLLightingEnvironment.m; sourceTree = "<group>"; };
+		63B817CE238EECD8006846C8 /* GLTFMTLTextureLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLTFMTLTextureLoader.m; sourceTree = "<group>"; };
+		63B817CF238EECD8006846C8 /* GLTFMTLShaderBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLTFMTLShaderBuilder.m; sourceTree = "<group>"; };
+		63B817D0238EECD8006846C8 /* GLTFMTLBufferAllocator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLTFMTLBufferAllocator.m; sourceTree = "<group>"; };
+		63B817D7238EECDF006846C8 /* GLTFMTL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GLTFMTL.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +137,8 @@
 		6383CDEE2385B16400A69B08 /* SCN Cyberstar */ = {
 			isa = PBXGroup;
 			children = (
+				63B817C2238EECBE006846C8 /* gltfmtl */,
+				63B81799238D961D006846C8 /* Metal classes */,
 				633E7F14238971BB009A97CC /* PixelBufferProducer */,
 				6383CDEF2385B16400A69B08 /* AppDelegate.swift */,
 				6383CDF12385B16400A69B08 /* art.scnassets */,
@@ -122,6 +151,7 @@
 				6383CDF82385B16500A69B08 /* Assets.xcassets */,
 				6383CDFA2385B16500A69B08 /* LaunchScreen.storyboard */,
 				6383CDFD2385B16500A69B08 /* Info.plist */,
+				63B817A0238D9892006846C8 /* SCN-Cyberstar-Bridging-Header.h */,
 			);
 			path = "SCN Cyberstar";
 			sourceTree = "<group>";
@@ -133,6 +163,53 @@
 				6383CE0C2385D40100A69B08 /* GLTFSCN.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		63B81799238D961D006846C8 /* Metal classes */ = {
+			isa = PBXGroup;
+			children = (
+				63B8179A238D9684006846C8 /* Renderer.swift */,
+				63B8179B238D9684006846C8 /* Shaders.metal */,
+				63B81797238D959B006846C8 /* MetalViewController.swift */,
+				63B8179F238D9874006846C8 /* ShaderTypes.h */,
+			);
+			path = "Metal classes";
+			sourceTree = "<group>";
+		};
+		63B817C2238EECBE006846C8 /* gltfmtl */ = {
+			isa = PBXGroup;
+			children = (
+				63B817D7238EECDF006846C8 /* GLTFMTL.h */,
+				63B817C3238EECD8006846C8 /* Headers */,
+				63B817CA238EECD8006846C8 /* Source */,
+			);
+			path = gltfmtl;
+			sourceTree = "<group>";
+		};
+		63B817C3238EECD8006846C8 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				63B817C4238EECD8006846C8 /* GLTFMTLShaderBuilder.h */,
+				63B817C5238EECD8006846C8 /* GLTFMTLTextureLoader.h */,
+				63B817C6238EECD8006846C8 /* GLTFMTLBufferAllocator.h */,
+				63B817C7238EECD8006846C8 /* GLTFMTLUtilities.h */,
+				63B817C8238EECD8006846C8 /* GLTFMTLRenderer.h */,
+				63B817C9238EECD8006846C8 /* GLTFMTLLightingEnvironment.h */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
+		63B817CA238EECD8006846C8 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				63B817CB238EECD8006846C8 /* GLTFMTLUtilities.m */,
+				63B817CC238EECD8006846C8 /* GLTFMTLRenderer.m */,
+				63B817CD238EECD8006846C8 /* GLTFMTLLightingEnvironment.m */,
+				63B817CE238EECD8006846C8 /* GLTFMTLTextureLoader.m */,
+				63B817CF238EECD8006846C8 /* GLTFMTLShaderBuilder.m */,
+				63B817D0238EECD8006846C8 /* GLTFMTLBufferAllocator.m */,
+			);
+			path = Source;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -168,6 +245,7 @@
 				TargetAttributes = {
 					6383CDEB2385B16400A69B08 = {
 						CreatedOnToolsVersion = 11.2.1;
+						LastSwiftMigration = 1120;
 					};
 				};
 			};
@@ -208,17 +286,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63B817D3238EECD8006846C8 /* GLTFMTLLightingEnvironment.m in Sources */,
 				6383CE082385C39200A69B08 /* Extensions.swift in Sources */,
 				633E7F1E238A6F61009A97CC /* PixelBufferProducer.swift in Sources */,
+				63B81798238D959B006846C8 /* MetalViewController.swift in Sources */,
+				63B817D1238EECD8006846C8 /* GLTFMTLUtilities.m in Sources */,
 				633E7F16238971DA009A97CC /* MetalPixelBufferProducer.swift in Sources */,
+				63B817D6238EECD8006846C8 /* GLTFMTLBufferAllocator.m in Sources */,
 				6383CDF42385B16400A69B08 /* ViewController.swift in Sources */,
+				63B817D4238EECD8006846C8 /* GLTFMTLTextureLoader.m in Sources */,
+				63B8179D238D9684006846C8 /* Renderer.swift in Sources */,
 				6383CE062385B98C00A69B08 /* FocusSquare.swift in Sources */,
 				633E7F1A238973D6009A97CC /* MTLPixelFormat.swift in Sources */,
+				63B8179E238D9684006846C8 /* Shaders.metal in Sources */,
 				6383CE132385D99B00A69B08 /* Node.swift in Sources */,
 				6383CE052385B98C00A69B08 /* FocusSquareSegment.swift in Sources */,
 				633E7F18238972A1009A97CC /* CAMetalRecordableLayer.swift in Sources */,
 				6383CDF02385B16400A69B08 /* AppDelegate.swift in Sources */,
+				63B817D5238EECD8006846C8 /* GLTFMTLShaderBuilder.m in Sources */,
 				633E7F1C2389750C009A97CC /* ARSCNViewRecordable.swift in Sources */,
+				63B817D2238EECD8006846C8 /* GLTFMTLRenderer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +449,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9JU8525BHK;
@@ -378,6 +466,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dreval.SCN-Cyberstar";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "SCN Cyberstar/SCN-Cyberstar-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -387,6 +477,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9JU8525BHK;
@@ -403,6 +494,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dreval.SCN-Cyberstar";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "SCN Cyberstar/SCN-Cyberstar-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

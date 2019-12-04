@@ -57,7 +57,8 @@ class Renderer {
         }
     }
     var gltfBufferAllocator: GLTFBufferAllocator!
-    
+    var timestep = 1/60.0
+
     // Metal objects
     var commandQueue: MTLCommandQueue!
     var sharedUniformBuffer: MTLBuffer!
@@ -107,7 +108,6 @@ class Renderer {
     
     private var globalTime: TimeInterval = 0.0
     private var assetTransform: simd_float4x4?
-    private var keyFrameIndex = 0
     
     init(session: ARSession, metalDevice device: MTLDevice, renderDestination: RenderDestinationProvider) {
         self.session = session
@@ -136,10 +136,8 @@ class Renderer {
     }
     
     func update() {
-        
-        let timestep = 1/60.0
-        
         updateAnimations(timestep: timestep)
+       
         // Wait to ensure only kMaxBuffersInFlight are getting proccessed by any stage in the Metal
         //   pipeline (App, Metal, Drivers, GPU, etc)
         let _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
@@ -203,12 +201,10 @@ class Renderer {
                         max = channel.duration
                         begin = channel.startTime
                     }
-                    print("\(channel.startTime) \(channel.endTime) \(channel.duration)")
                 }
             }
         })
         let animTime = fmod(globalTime, max)
-        print(animTime + begin)
         gltfAsset?.animations.forEach({ (animation) in
             animation.run(atTime: animTime + begin)
         })

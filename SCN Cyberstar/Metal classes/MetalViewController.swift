@@ -54,9 +54,6 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
         toast.layer.cornerRadius = 8.0
         controlsView.layer.masksToBounds = true
         controlsView.layer.cornerRadius = 8.0
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(MetalViewController.handleTap(gestureRecognize:)))
-        view.addGestureRecognizer(tapGesture)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -121,19 +118,19 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
         nodesQueue.async {
             self.asset = GLTFAsset(url: url, bufferAllocator: self.renderer.gltfBufferAllocator)
             
-            let node = GLTFNode()
-            node.translation = simd_float3(0, 0, 1)
-            node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
-            let dirLight = GLTFKHRLight()
-            node.light = dirLight
-            self.asset?.defaultScene?.addNode(node)
-            self.asset?.addLight(dirLight)
-            
-            let light = GLTFKHRLight()
-            light.type = .ambient
-            light.intensity = 0.2
-            self.asset?.addLight(light)
-            self.asset?.defaultScene?.ambientLight = light
+//            let node = GLTFNode()
+//            node.translation = simd_float3(0, 0, 1)
+//            node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
+//            let dirLight = GLTFKHRLight()
+//            node.light = dirLight
+//            self.asset?.defaultScene?.addNode(node)
+//            self.asset?.addLight(dirLight)
+//
+//            let light = GLTFKHRLight()
+//            light.type = .ambient
+//            light.intensity = 0.2
+//            self.asset?.addLight(light)
+//            self.asset?.defaultScene?.ambientLight = light
             self.renderer.gltfAsset = self.asset
         }
     }

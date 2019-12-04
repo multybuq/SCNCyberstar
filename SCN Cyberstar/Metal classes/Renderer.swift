@@ -47,7 +47,15 @@ class Renderer {
     var renderDestination: RenderDestinationProvider
     
     var gltfRenderer: GLTFMTLRenderer!
-    var gltfAsset: GLTFAsset?
+    var gltfAsset: GLTFAsset? {
+        didSet {
+            let bounds = GLTFBoundingSphereFromBox(self.gltfAsset!.defaultScene!.approximateBounds)
+            let scale = bounds.radius > 0 ? 0.5/bounds.radius : 1.0
+            let centerScale = GLTFMatrixFromUniformScale(scale)
+            let centerTranslation = GLTFMatrixFromTranslation(-bounds.center)
+            self.assetTransform = matrix_multiply(centerScale, centerTranslation)
+        }
+    }
     var gltfBufferAllocator: GLTFBufferAllocator!
     
     // Metal objects
@@ -98,6 +106,8 @@ class Renderer {
     var viewportSizeDidChange: Bool = false
     
     private var globalTime: TimeInterval = 0.0
+    private var assetTransform: simd_float4x4?
+    private var keyFrameIndex = 0
     
     init(session: ARSession, metalDevice device: MTLDevice, renderDestination: RenderDestinationProvider) {
         self.session = session
@@ -110,10 +120,12 @@ class Renderer {
         gltfRenderer.depthStencilPixelFormat = .depth32Float_stencil8
         gltfBufferAllocator = GLTFMTLBufferAllocator(device: device)
 
-        if let url = Bundle.main.url(forResource: "", withExtension: "hdr") {
-            let lighting = GLTFMTLLightingEnvironment(contentsOf: url, device: device, error: nil)
-            lighting.intensity = 2.0
-            gltfRenderer.lightingEnvironment = lighting
+        DispatchQueue.global().async {
+            if let url = Bundle.main.url(forResource: "art.scnassets/piazza_san_marco", withExtension: "hdr") {
+                let lighting = GLTFMTLLightingEnvironment(contentsOf: url, device: device, error: nil)
+                lighting.intensity = 2.0
+                self.gltfRenderer.lightingEnvironment = lighting
+            }
         }
     }
     
@@ -183,19 +195,22 @@ class Renderer {
         globalTime += timestep
         
         var max = 0.0
+        var begin = 0.0
         gltfAsset?.animations.forEach({ (animation) in
             animation.channels.forEach { (channel) in
                 if let channel = channel as? GLTFAnimationChannel {
                     if channel.duration > max {
                         max = channel.duration
+                        begin = channel.startTime
                     }
+                    print("\(channel.startTime) \(channel.endTime) \(channel.duration)")
                 }
             }
         })
-        
         let animTime = fmod(globalTime, max)
+        print(animTime + begin)
         gltfAsset?.animations.forEach({ (animation) in
-            animation.run(atTime: animTime)
+            animation.run(atTime: animTime + begin)
         })
     }
     
@@ -412,7 +427,12 @@ class Renderer {
         uniforms.pointee.viewMatrix = frame.camera.viewMatrix(for: .portrait)
         uniforms.pointee.projectionMatrix = frame.camera.projectionMatrix(for: .portrait, viewportSize: viewportSize, zNear: 0.001, zFar: 1000)
         
-        self.gltfRenderer.viewMatrix = uniforms.pointee.viewMatrix
+        if let m = assetTransform {
+            self.gltfRenderer.viewMatrix = matrix_multiply(uniforms.pointee.viewMatrix, m)
+        } else {
+            self.gltfRenderer.viewMatrix = uniforms.pointee.viewMatrix
+        }
+       // self.gltfRenderer.viewMatrix = uniforms.pointee.viewMatrix
         self.gltfRenderer.projectionMatrix = uniforms.pointee.projectionMatrix
 
         // Set up lighting for the scene using the ambient intensity if provided

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		631510822397B064007C5425 /* hdr.metal in Sources */ = {isa = PBXBuildFile; fileRef = 6315107F2397B063007C5425 /* hdr.metal */; };
+		631510832397B064007C5425 /* skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = 631510802397B063007C5425 /* skybox.metal */; };
+		631510842397B064007C5425 /* brdf.metal in Sources */ = {isa = PBXBuildFile; fileRef = 631510812397B063007C5425 /* brdf.metal */; };
 		633E7F16238971DA009A97CC /* MetalPixelBufferProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633E7F15238971DA009A97CC /* MetalPixelBufferProducer.swift */; };
 		633E7F18238972A1009A97CC /* CAMetalRecordableLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633E7F17238972A1009A97CC /* CAMetalRecordableLayer.swift */; };
 		633E7F1A238973D6009A97CC /* MTLPixelFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633E7F19238973D6009A97CC /* MTLPixelFormat.swift */; };
@@ -53,6 +56,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6315107F2397B063007C5425 /* hdr.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = hdr.metal; sourceTree = "<group>"; };
+		631510802397B063007C5425 /* skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = skybox.metal; sourceTree = "<group>"; };
+		631510812397B063007C5425 /* brdf.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = brdf.metal; sourceTree = "<group>"; };
 		633E7F15238971DA009A97CC /* MetalPixelBufferProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalPixelBufferProducer.swift; sourceTree = "<group>"; };
 		633E7F17238972A1009A97CC /* CAMetalRecordableLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CAMetalRecordableLayer.swift; sourceTree = "<group>"; };
 		633E7F19238973D6009A97CC /* MTLPixelFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTLPixelFormat.swift; sourceTree = "<group>"; };
@@ -168,6 +174,9 @@
 		63B81799238D961D006846C8 /* Metal classes */ = {
 			isa = PBXGroup;
 			children = (
+				631510812397B063007C5425 /* brdf.metal */,
+				6315107F2397B063007C5425 /* hdr.metal */,
+				631510802397B063007C5425 /* skybox.metal */,
 				63B8179A238D9684006846C8 /* Renderer.swift */,
 				63B8179B238D9684006846C8 /* Shaders.metal */,
 				63B81797238D959B006846C8 /* MetalViewController.swift */,
@@ -287,8 +296,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				63B817D3238EECD8006846C8 /* GLTFMTLLightingEnvironment.m in Sources */,
+				631510832397B064007C5425 /* skybox.metal in Sources */,
+				631510822397B064007C5425 /* hdr.metal in Sources */,
 				6383CE082385C39200A69B08 /* Extensions.swift in Sources */,
 				633E7F1E238A6F61009A97CC /* PixelBufferProducer.swift in Sources */,
+				631510842397B064007C5425 /* brdf.metal in Sources */,
 				63B81798238D959B006846C8 /* MetalViewController.swift in Sources */,
 				63B817D1238EECD8006846C8 /* GLTFMTLUtilities.m in Sources */,
 				633E7F16238971DA009A97CC /* MetalPixelBufferProducer.swift in Sources */,

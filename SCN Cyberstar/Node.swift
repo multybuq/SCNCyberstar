@@ -42,7 +42,7 @@ class Node: SCNNode {
                 if let first = gltfAsset.animations.sorted(by: { $0.key.lowercased() < $1.key.lowercased() }).last {
                     self.animation = first.value
                     first.value.forEach { (pair) in
-                        pair.animation.beginTime = 0.0
+                       // pair.animation.beginTime = 0.0
                         pair.target.addAnimation(pair.animation, forKey: nil)
                     }
                 }

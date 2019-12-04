@@ -47,7 +47,6 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
             
             // Configure the renderer to draw to the view
             renderer = Renderer(session: session, metalDevice: view.device!, renderDestination: view)
-            
             renderer.drawRectResized(size: view.bounds.size)
         }
         
@@ -132,7 +131,7 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
             
             let light = GLTFKHRLight()
             light.type = .ambient
-            light.intensity = 1.0
+            light.intensity = 0.2
             self.asset?.addLight(light)
             self.asset?.defaultScene?.ambientLight = light
             self.renderer.gltfAsset = self.asset

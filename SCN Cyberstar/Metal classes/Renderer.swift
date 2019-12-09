@@ -10,7 +10,7 @@ import Foundation
 import Metal
 import MetalKit
 import ARKit
-//import GLTF
+import GLTF
 //import GLTFMTL
 
 protocol RenderDestinationProvider {
@@ -50,12 +50,26 @@ class Renderer {
     var gltfAsset: GLTFAsset? {
         didSet {
             if let asset = self.gltfAsset {
+//                let light = GLTFKHRLight()
+//                light.type = .ambient
+//                light.intensity = 0.5
+//                asset.addLight(light)
+//                asset.defaultScene?.ambientLight = light
+//                
+//                let node = GLTFNode()
+//                node.translation = simd_float3(0, 0, 1)
+//                node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
+//                let dir = GLTFKHRLight()
+//                node.light = dir
+//                asset.defaultScene?.addNode(node)
+//                asset.addLight(dir)
+//                
                 let bounds = GLTFBoundingSphereFromBox(asset.defaultScene!.approximateBounds)
                 let scale = bounds.radius > 0 ? 0.5/bounds.radius : 0.5
                 let centerScale = GLTFMatrixFromUniformScale(scale)
                 let centerTranslation = GLTFMatrixFromTranslation(-bounds.center)
                 self.assetTransform = matrix_multiply(centerScale, centerTranslation)
-              //  self.assetTransform?.columns.3 = focusSquareTransform!.columns.3
+                self.assetTransform?.columns.3 = focusSquareTransform!.columns.3
             }
         }
     }
@@ -341,13 +355,13 @@ class Renderer {
         anchorPipelineStateDescriptor.fragmentFunction = anchorGeometryFragmentFunction
         anchorPipelineStateDescriptor.vertexDescriptor = geometryVertexDescriptor
         anchorPipelineStateDescriptor.colorAttachments[0].pixelFormat = renderDestination.colorPixelFormat
-//        anchorPipelineStateDescriptor.colorAttachments[0].isBlendingEnabled = true
-//        anchorPipelineStateDescriptor.colorAttachments[0].rgbBlendOperation = .add
-//        anchorPipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = .add
-//        anchorPipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = .one
-//        anchorPipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .one
-//        anchorPipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
-//        anchorPipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
+        anchorPipelineStateDescriptor.colorAttachments[0].isBlendingEnabled = true
+        anchorPipelineStateDescriptor.colorAttachments[0].rgbBlendOperation = .add
+        anchorPipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = .add
+        anchorPipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = .one
+        anchorPipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .one
+        anchorPipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+        anchorPipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
         anchorPipelineStateDescriptor.depthAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
         anchorPipelineStateDescriptor.stencilAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
         

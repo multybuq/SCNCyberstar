@@ -9,6 +9,7 @@
 import Foundation
 import AVFoundation
 import SceneKit
+import MetalKit
 
 extension PixelBufferProducer {
     enum Error: Swift.Error {
@@ -21,7 +22,8 @@ extension PixelBufferProducer {
 }
 
 class PixelBufferProducer {
-    let sceneView: SCNView
+    var sceneView: SCNView?
+    var mtkView: MTKView?
     let queue: DispatchQueue
     private var pixelBufferProducer: MetalPixelBufferProducer
     private lazy var pixelBufferPool: CVPixelBufferPool = {
@@ -52,6 +54,19 @@ class PixelBufferProducer {
         default:
             throw Error.metalLayer
         }
+    }
+    
+    public init(_ mtkView: MTKView) throws {
+        self.mtkView = mtkView
+        self.queue = DispatchQueue(label: "com.dreval.scncyberstar.producerQueue", qos: .userInitiated)
+        #if !targetEnvironment(simulator)
+        guard let metalLayer = mtkView.layer as? CAMetalRecordableLayer else {
+            throw Error.metalLayer
+        }
+        pixelBufferProducer = MetalPixelBufferProducer(metalLayer: metalLayer)
+        #else
+        throw Error.simulator
+        #endif
     }
     
     func producePixelBuffer() -> CVPixelBuffer? {

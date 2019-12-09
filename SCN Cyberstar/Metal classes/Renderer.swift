@@ -10,7 +10,7 @@ import Foundation
 import Metal
 import MetalKit
 import ARKit
-import GLTF
+//import GLTF
 //import GLTFMTL
 
 protocol RenderDestinationProvider {
@@ -25,7 +25,7 @@ protocol RenderDestinationProvider {
 let kMaxBuffersInFlight: Int = 3
 
 // The max number anchors our uniform buffer will hold
-let kMaxAnchorInstanceCount: Int = 64
+let kMaxAnchorInstanceCount: Int = 1
 
 // The 16 byte aligned size of our uniform structures
 let kAlignedSharedUniformsSize: Int = (MemoryLayout<SharedUniforms>.size & ~0xFF) + 0x100
@@ -49,16 +49,20 @@ class Renderer {
     var gltfRenderer: GLTFMTLRenderer!
     var gltfAsset: GLTFAsset? {
         didSet {
-            let bounds = GLTFBoundingSphereFromBox(self.gltfAsset!.defaultScene!.approximateBounds)
-            let scale = bounds.radius > 0 ? 0.5/bounds.radius : 1.0
-            let centerScale = GLTFMatrixFromUniformScale(scale)
-            let centerTranslation = GLTFMatrixFromTranslation(-bounds.center)
-            self.assetTransform = matrix_multiply(centerScale, centerTranslation)
+            if let asset = self.gltfAsset {
+                let bounds = GLTFBoundingSphereFromBox(asset.defaultScene!.approximateBounds)
+                let scale = bounds.radius > 0 ? 0.5/bounds.radius : 0.5
+                let centerScale = GLTFMatrixFromUniformScale(scale)
+                let centerTranslation = GLTFMatrixFromTranslation(-bounds.center)
+                self.assetTransform = matrix_multiply(centerScale, centerTranslation)
+              //  self.assetTransform?.columns.3 = focusSquareTransform!.columns.3
+            }
         }
     }
     var gltfBufferAllocator: GLTFBufferAllocator!
     var timestep = 1/60.0
-
+    var animationIsPaused = false
+    
     // Metal objects
     var commandQueue: MTLCommandQueue!
     var sharedUniformBuffer: MTLBuffer!
@@ -105,6 +109,8 @@ class Renderer {
     
     // Flag for viewport size changes
     var viewportSizeDidChange: Bool = false
+    
+    var focusSquareTransform: simd_float4x4?
     
     private var globalTime: TimeInterval = 0.0
     private var assetTransform: simd_float4x4?
@@ -171,7 +177,7 @@ class Renderer {
                 renderEncoder.label = "MyRenderEncoder"
                 
                 drawCapturedImage(renderEncoder: renderEncoder)
-               // drawAnchorGeometry(renderEncoder: renderEncoder)
+                drawAnchorGeometry(renderEncoder: renderEncoder)
                 
                 if let gltf = gltfAsset?.defaultScene {
                     gltfRenderer.renderScene(gltf, commandBuffer: commandBuffer, commandEncoder: renderEncoder)
@@ -190,8 +196,8 @@ class Renderer {
     }
     
     func updateAnimations(timestep: TimeInterval) {
+        guard animationIsPaused == false else { return }
         globalTime += timestep
-        
         var max = 0.0
         var begin = 0.0
         gltfAsset?.animations.forEach({ (animation) in
@@ -335,6 +341,13 @@ class Renderer {
         anchorPipelineStateDescriptor.fragmentFunction = anchorGeometryFragmentFunction
         anchorPipelineStateDescriptor.vertexDescriptor = geometryVertexDescriptor
         anchorPipelineStateDescriptor.colorAttachments[0].pixelFormat = renderDestination.colorPixelFormat
+//        anchorPipelineStateDescriptor.colorAttachments[0].isBlendingEnabled = true
+//        anchorPipelineStateDescriptor.colorAttachments[0].rgbBlendOperation = .add
+//        anchorPipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = .add
+//        anchorPipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = .one
+//        anchorPipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .one
+//        anchorPipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+//        anchorPipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
         anchorPipelineStateDescriptor.depthAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
         anchorPipelineStateDescriptor.stencilAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
         
@@ -370,7 +383,7 @@ class Renderer {
         (vertexDescriptor.attributes[Int(kVertexAttributeNormal.rawValue)] as! MDLVertexAttribute).name   = MDLVertexAttributeNormal
         
         // Use ModelIO to create a box mesh as our object
-        let mesh = MDLMesh(boxWithExtent: vector3(0.075, 0.075, 0.075), segments: vector3(1, 1, 1), inwardNormals: false, geometryType: .triangles, allocator: metalAllocator)
+        let mesh = MDLMesh(boxWithExtent: vector3(0.075, 0.001, 0.075), segments: vector3(1, 1, 1), inwardNormals: false, geometryType: .triangles, allocator: metalAllocator)
         
         // Perform the format/relayout of mesh vertices by setting the new vertex descriptor in our
         //   Model IO mesh
@@ -451,26 +464,20 @@ class Renderer {
         uniforms.pointee.materialShininess = 30
     }
     
-    func updateAnchors(frame: ARFrame) {
-        // Update the anchor uniform buffer with transforms of the current frame's anchors
-        anchorInstanceCount = min(frame.anchors.count, kMaxAnchorInstanceCount)
-        
-        var anchorOffset: Int = 0
-        if anchorInstanceCount == kMaxAnchorInstanceCount {
-            anchorOffset = max(frame.anchors.count - kMaxAnchorInstanceCount, 0)
-        }
-        
+    func updateAnchors(frame: ARFrame) {        
+        anchorInstanceCount = 1 //min(anchors.count, kMaxAnchorInstanceCount)
+
         for index in 0..<anchorInstanceCount {
-            let anchor = frame.anchors[index + anchorOffset]
-            
             // Flip Z axis to convert geometry from right handed to left handed
             var coordinateSpaceTransform = matrix_identity_float4x4
             coordinateSpaceTransform.columns.2.z = -1.0
-            
-            let modelMatrix = simd_mul(anchor.transform, coordinateSpaceTransform)
-            
-            let anchorUniforms = anchorUniformBufferAddress.assumingMemoryBound(to: InstanceUniforms.self).advanced(by: index)
-            anchorUniforms.pointee.modelMatrix = modelMatrix
+
+            if let anchorTransform = focusSquareTransform {
+                let modelMatrix = simd_mul(anchorTransform, coordinateSpaceTransform)
+                
+                let anchorUniforms = anchorUniformBufferAddress.assumingMemoryBound(to: InstanceUniforms.self).advanced(by: index)
+                anchorUniforms.pointee.modelMatrix = modelMatrix
+            }
         }
     }
     
@@ -544,7 +551,6 @@ class Renderer {
         guard anchorInstanceCount > 0 else {
             return
         }
-        
         // Push a debug group allowing us to identify render commands in the GPU Frame Capture tool
         renderEncoder.pushDebugGroup("DrawAnchors")
         

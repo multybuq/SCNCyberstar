@@ -179,7 +179,7 @@
         <scene sceneID="VtO-jG-3Rp">
             <objects>
                 <viewController id="DMV-rd-4io" customClass="MetalViewController" customModule="SCN_Cyberstar" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="OSB-Dm-dFp" customClass="MTKView">
+                    <view key="view" contentMode="scaleToFill" id="OSB-Dm-dFp" customClass="MTKViewRecordable" customModule="SCN_Cyberstar" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>

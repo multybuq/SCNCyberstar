@@ -98,12 +98,12 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     
     // Color each face a different color
     ushort colorID = vid / 4 % 6;
-    out.color = colorID == 0 ? float4(0.0, 1.0, 0.0, 1.0) // Right face
-              : colorID == 1 ? float4(1.0, 0.0, 0.0, 1.0) // Left face
-              : colorID == 2 ? float4(0.0, 0.0, 1.0, 1.0) // Top face
-              : colorID == 3 ? float4(1.0, 0.5, 0.0, 1.0) // Bottom face
+    out.color = colorID == 0 ? float4(1.0, 1.0, 0.0, 1.0) // Right face
+              : colorID == 1 ? float4(1.0, 1.0, 0.0, 1.0) // Left face
+              : colorID == 2 ? float4(1.0, 1.0, 0.0, 0.0) // Top face
+              : colorID == 3 ? float4(1.0, 1.0, 0.0, 0.0) // Bottom face
               : colorID == 4 ? float4(1.0, 1.0, 0.0, 1.0) // Back face
-              : float4(1.0, 1.0, 1.0, 1.0); // Front face
+              : float4(1.0, 1.0, 0.0, 1.0); // Front face
     
     // Calculate the positon of our vertex in eye space
     out.eyePosition = half3((modelViewMatrix * position).xyz);

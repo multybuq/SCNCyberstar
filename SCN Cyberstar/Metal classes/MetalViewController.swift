@@ -25,9 +25,15 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
     
     var session: ARSession!
     var renderer: Renderer!
-    var asset: GLTFAsset?
     let nodesQueue = DispatchQueue(label: "com.dreval.scncyberstar.nodesQueue")
+    var pixelProducer: PixelBufferProducer?
 
+    var screenCenter: CGPoint {
+        return CGPoint(x: view.bounds.midX, y: view.bounds.midY)
+    }
+    
+    var anchor: ARAnchor?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -48,6 +54,11 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
             // Configure the renderer to draw to the view
             renderer = Renderer(session: session, metalDevice: view.device!, renderDestination: view)
             renderer.drawRectResized(size: view.bounds.size)
+            
+            if let layer = view.layer as? CAMetalLayer {
+                layer.framebufferOnly = false
+                try? pixelProducer = PixelBufferProducer(view)
+            }
         }
         
         toast.layer.masksToBounds = true
@@ -75,22 +86,6 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
         session.run(configuration, options: [.removeExistingAnchors, .resetTracking])
     }
     
-    @objc
-    func handleTap(gestureRecognize: UITapGestureRecognizer) {
-        // Create anchor using the camera's current position
-        if let currentFrame = session.currentFrame {
-            
-            // Create a transform with a translation of 0.2 meters in front of the camera
-            var translation = matrix_identity_float4x4
-            translation.columns.3.z = -0.6
-            let transform = simd_mul(currentFrame.camera.transform, translation)
-            
-            // Add a new anchor to the session
-            let anchor = ARAnchor(transform: transform)
-            session.add(anchor: anchor)
-        }
-    }
-    
     // MARK: - MTKViewDelegate
     
     // Called whenever view changes orientation or layout is changed
@@ -100,7 +95,19 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
     
     // Called whenever the view needs to render
     func draw(in view: MTKView) {
+        hitTest(point: screenCenter)
         renderer.update()
+        
+        if let producer = pixelProducer {
+            producer.queue.async {
+                if let buffer = producer.producePixelBuffer() {
+                    let image = UIImage(ciImage: CIImage(cvImageBuffer: buffer))
+                    DispatchQueue.main.async {
+                        self.pixelBufferImageView.image = image
+                    }
+                }
+            }
+        }
     }
     
     private func updateStackView(enabled: Bool) {
@@ -116,22 +123,8 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
         controlsView.isHidden = false
         stackView.isHidden = true
         nodesQueue.async {
-            self.asset = GLTFAsset(url: url, bufferAllocator: self.renderer.gltfBufferAllocator)
-            
-//            let node = GLTFNode()
-//            node.translation = simd_float3(0, 0, 1)
-//            node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
-//            let dirLight = GLTFKHRLight()
-//            node.light = dirLight
-//            self.asset?.defaultScene?.addNode(node)
-//            self.asset?.addLight(dirLight)
-//
-//            let light = GLTFKHRLight()
-//            light.type = .ambient
-//            light.intensity = 0.2
-//            self.asset?.addLight(light)
-//            self.asset?.defaultScene?.ambientLight = light
-            self.renderer.gltfAsset = self.asset
+            let asset = GLTFAsset(url: url, bufferAllocator: self.renderer.gltfBufferAllocator)
+            self.renderer.gltfAsset = asset
         }
     }
 }
@@ -139,7 +132,7 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
 //MARK: IBActions
 extension MetalViewController {
     @IBAction func loadRobot() {
-        if let modelUrl = Bundle.main.url(forResource: "art.scnassets/Tesla", withExtension: "glb") {
+        if let modelUrl = Bundle.main.url(forResource: "art.scnassets/1", withExtension: "glb") {
             loadModel(url: modelUrl)
         }
     }
@@ -151,7 +144,7 @@ extension MetalViewController {
     }
     
     @IBAction func loadHand() {
-        if let modelUrl = Bundle.main.url(forResource: "art.scnassets/Mone", withExtension: "glb") {
+        if let modelUrl = Bundle.main.url(forResource: "art.scnassets/3", withExtension: "glb") {
             loadModel(url: modelUrl)
         }
     }
@@ -159,14 +152,16 @@ extension MetalViewController {
     @IBAction func sliderValueChanged(sender: UISlider) {
         let speed = sender.value
         nodesQueue.async {
-
+            self.renderer.setSpeed(speed: speed)
         }
     }
     
     @IBAction func reset() {
-
         controlsView.isHidden = true
         stackView.isHidden = false
+        nodesQueue.async {
+            self.renderer.gltfAsset = nil
+        }
     }
     
     @IBAction func playback(sender: UIButton) {
@@ -174,12 +169,12 @@ extension MetalViewController {
         if sender.isSelected {
             //pause animation here
             nodesQueue.async {
-
+                self.renderer.pause()
             }
         } else {
             //play animation here
             nodesQueue.async {
-
+                self.renderer.play()
             }
         }
     }
@@ -215,6 +210,8 @@ extension MetalViewController: ARSessionObserver {
             message = "Move to find a horizontal surface"
             stackView.isHidden = false
             updateStackView(enabled: true)
+            let new = ARAnchor(name: "focus", transform: matrix_identity_float4x4)
+            session.add(anchor: new)
         default:
             message = "Camera changed tracking state"
         }
@@ -238,5 +235,19 @@ extension MetalViewController {
         UIView.animate(withDuration: 0.25, animations: {
             self.toast.alpha = 0
         })
+    }
+}
+
+extension MetalViewController {
+    func hitTest(point: CGPoint) {
+        if let frame = session.currentFrame {
+            let unitPoint = CGPoint(x: point.x / view.bounds.width, y: point.y / view.bounds.height)
+            let transform = frame.displayTransform(for: .portrait, viewportSize: view.bounds.size)
+            let frameUnitPoint = unitPoint.applying(transform.inverted())
+            let hitTestResults = frame.hitTest(frameUnitPoint, types: [.existingPlane, .estimatedHorizontalPlane])
+            if let result = hitTestResults.first {
+                renderer.focusSquareTransform = result.worldTransform
+            }
+        }
     }
 }

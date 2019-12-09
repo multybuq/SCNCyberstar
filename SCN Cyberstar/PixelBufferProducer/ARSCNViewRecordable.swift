@@ -24,9 +24,5 @@ open class ARSCNViewRecordable: ARSCNView {
     var lastDrawable: CAMetalDrawable? {
         return metalLayer?.lastDrawable
     }
-    
-    
-
     #endif
-
 }

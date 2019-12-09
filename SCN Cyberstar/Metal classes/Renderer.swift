@@ -50,20 +50,20 @@ class Renderer {
     var gltfAsset: GLTFAsset? {
         didSet {
             if let asset = self.gltfAsset {
-//                let light = GLTFKHRLight()
-//                light.type = .ambient
-//                light.intensity = 0.5
-//                asset.addLight(light)
-//                asset.defaultScene?.ambientLight = light
-//                
-//                let node = GLTFNode()
-//                node.translation = simd_float3(0, 0, 1)
-//                node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
-//                let dir = GLTFKHRLight()
-//                node.light = dir
-//                asset.defaultScene?.addNode(node)
-//                asset.addLight(dir)
-//                
+                let light = GLTFKHRLight()
+                light.type = .ambient
+                light.intensity = 0.5
+                asset.addLight(light)
+                asset.defaultScene?.ambientLight = light
+
+                let node = GLTFNode()
+                node.translation = simd_float3(0, 0, 1)
+                node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
+                let dir = GLTFKHRLight()
+                node.light = dir
+                asset.defaultScene?.addNode(node)
+                asset.addLight(dir)
+
                 let bounds = GLTFBoundingSphereFromBox(asset.defaultScene!.approximateBounds)
                 let scale = bounds.radius > 0 ? 0.5/bounds.radius : 0.5
                 let centerScale = GLTFMatrixFromUniformScale(scale)

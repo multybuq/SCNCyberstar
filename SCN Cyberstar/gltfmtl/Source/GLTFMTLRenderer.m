@@ -247,6 +247,51 @@ typedef struct {
     return depthStencilState;
 }
 
+- (void) renderScene:(GLTFScene *)scene commandBuffer:(id<MTLCommandBuffer>)commandBuffer commandEncoder:(id<MTLRenderCommandEncoder>)renderEncoder pipeline:(id<MTLRenderPipelineState>)pipeline {
+    if (scene == nil) {
+        return;
+    }
+    
+    long timedOut = dispatch_semaphore_wait(self.frameBoundarySemaphore, dispatch_time(0, 1 * NSEC_PER_SEC));
+    if (timedOut) {
+        NSLog(@"Failed to receive frame boundary signal before timing out; calling signalFrameCompletion manually. "
+              "Remember to call signalFrameCompletion on GLTFMTLRenderer from the completion handler of the command buffer "
+              "into which you encode the work for drawing assets");
+        [self signalFrameCompletion];
+    }
+    
+    self.ambientLight = scene.ambientLight;
+
+    for (GLTFNode *rootNode in scene.nodes) {
+        [self buildLightListRecursive:rootNode];
+    }
+    
+    for (GLTFNode *rootNode in scene.nodes) {
+        simd_float4x4 matrix = matrix_identity_float4x4;
+        matrix.columns[3].z = -4;
+        [self buildRenderListRecursive:rootNode modelMatrix:matrix];
+    }
+    
+    NSMutableArray *renderList = [NSMutableArray arrayWithArray:self.opaqueRenderItems];
+    [renderList addObjectsFromArray:self.transparentRenderItems];
+    
+    [self drawRenderList:renderList commandEncoder:renderEncoder pipeline:pipeline];
+    
+    NSArray *copiedDeferredReusableBuffers = [self.deferredReusableBuffers copy];
+    [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> commandBuffer) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            for (id<MTLBuffer> buffer in copiedDeferredReusableBuffers) {
+                [self enqueueReusableBuffer:buffer];
+            }
+        });
+    }];
+    
+    [self.opaqueRenderItems removeAllObjects];
+    [self.transparentRenderItems removeAllObjects];
+    [self.currentLightNodes removeAllObjects];
+    [self.deferredReusableBuffers removeAllObjects];
+}
+
 - (void)renderScene:(GLTFScene *)scene
       commandBuffer:(id<MTLCommandBuffer>)commandBuffer
      commandEncoder:(id<MTLRenderCommandEncoder>)renderEncoder
@@ -278,7 +323,7 @@ typedef struct {
     NSMutableArray *renderList = [NSMutableArray arrayWithArray:self.opaqueRenderItems];
     [renderList addObjectsFromArray:self.transparentRenderItems];
     
-    [self drawRenderList:renderList commandEncoder:renderEncoder];
+    [self drawRenderList:renderList commandEncoder:renderEncoder pipeline:nil];
     
     NSArray *copiedDeferredReusableBuffers = [self.deferredReusableBuffers copy];
     [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> commandBuffer) {
@@ -457,7 +502,7 @@ typedef struct {
     }
 }
 
-- (void)drawRenderList:(NSArray<GLTFMTLRenderItem *> *)renderList commandEncoder:(id<MTLRenderCommandEncoder>)renderEncoder {
+- (void)drawRenderList:(NSArray<GLTFMTLRenderItem *> *)renderList commandEncoder:(id<MTLRenderCommandEncoder>)renderEncoder pipeline:(id<MTLRenderPipelineState>)pipeline {
     for (GLTFMTLRenderItem *item in renderList) {
         GLTFNode *node = item.node;
         GLTFSubmesh *submesh = item.submesh;
@@ -467,6 +512,10 @@ typedef struct {
         
         id<MTLRenderPipelineState> renderPipelineState = [self renderPipelineStateForSubmesh:submesh];
                 
+        if (!renderPipelineState) {
+            renderPipelineState = pipeline;
+        }
+        
         [renderEncoder setRenderPipelineState:renderPipelineState];
         
         [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];

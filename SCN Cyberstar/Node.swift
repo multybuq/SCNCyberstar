@@ -53,8 +53,6 @@ class Node: SCNNode {
     func play() {
         if let animation = animation {
             animation.forEach { (pair) in
-                //pair.target.isPaused = false
-                print(pair.animation.autoreverses);
                 pair.target.animationKeys.forEach { (key) in
                     pair.target.animationPlayer(forKey: key)?.paused = false
                 }
@@ -65,7 +63,6 @@ class Node: SCNNode {
     func pause() {
         if let animation = animation {
             animation.forEach { (pair) in
-                //pair.target.isPaused = true
                 pair.target.animationKeys.forEach { (key) in
                     pair.target.animationPlayer(forKey: key)?.paused = true
                 }
@@ -78,7 +75,6 @@ class Node: SCNNode {
             animation.forEach { (pair) in
                 pair.target.animationKeys.forEach { (key) in
                     pair.target.animationPlayer(forKey: key)?.speed = CGFloat(speed)
-                    //pair.target.setAnimationSpeed(CGFloat(speed), forKey: key)
                 }
             }
         }

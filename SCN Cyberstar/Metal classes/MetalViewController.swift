@@ -65,6 +65,7 @@ class MetalViewController: UIViewController, MTKViewDelegate, ARSessionDelegate 
         toast.layer.cornerRadius = 8.0
         controlsView.layer.masksToBounds = true
         controlsView.layer.cornerRadius = 8.0
+        updateStackView(enabled: false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -144,7 +145,7 @@ extension MetalViewController {
     }
     
     @IBAction func loadHand() {
-        if let modelUrl = Bundle.main.url(forResource: "art.scnassets/3", withExtension: "glb") {
+        if let modelUrl = Bundle.main.url(forResource: "art.scnassets/Mone", withExtension: "glb") {
             loadModel(url: modelUrl)
         }
     }
@@ -210,8 +211,6 @@ extension MetalViewController: ARSessionObserver {
             message = "Move to find a horizontal surface"
             stackView.isHidden = false
             updateStackView(enabled: true)
-            let new = ARAnchor(name: "focus", transform: matrix_identity_float4x4)
-            session.add(anchor: new)
         default:
             message = "Camera changed tracking state"
         }
@@ -246,6 +245,9 @@ extension MetalViewController {
             let frameUnitPoint = unitPoint.applying(transform.inverted())
             let hitTestResults = frame.hitTest(frameUnitPoint, types: [.existingPlane, .estimatedHorizontalPlane])
             if let result = hitTestResults.first {
+                /// Uncomment it if you want to place model to existing plane only
+               // updateStackView(enabled: result.type == .existingPlane)
+                
                 renderer.focusSquareTransform = result.worldTransform
             }
         }

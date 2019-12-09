@@ -50,19 +50,21 @@ class Renderer {
     var gltfAsset: GLTFAsset? {
         didSet {
             if let asset = self.gltfAsset {
-                let light = GLTFKHRLight()
-                light.type = .ambient
-                light.intensity = 0.5
-                asset.addLight(light)
-                asset.defaultScene?.ambientLight = light
+                if self.gltfRenderer.lightingEnvironment == nil {
+                    let light = GLTFKHRLight()
+                    light.type = .ambient
+                    light.intensity = 0.5
+                    asset.addLight(light)
+                    asset.defaultScene?.ambientLight = light
 
-                let node = GLTFNode()
-                node.translation = simd_float3(0, 0, 1)
-                node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
-                let dir = GLTFKHRLight()
-                node.light = dir
-                asset.defaultScene?.addNode(node)
-                asset.addLight(dir)
+                    let node = GLTFNode()
+                    node.translation = simd_float3(0, 0, 1)
+                    node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
+                    let dir = GLTFKHRLight()
+                    node.light = dir
+                    asset.defaultScene?.addNode(node)
+                    asset.addLight(dir)
+                }
 
                 let bounds = GLTFBoundingSphereFromBox(asset.defaultScene!.approximateBounds)
                 let scale = bounds.radius > 0 ? 0.5/bounds.radius : 0.5
@@ -70,6 +72,7 @@ class Renderer {
                 let centerTranslation = GLTFMatrixFromTranslation(-bounds.center)
                 self.assetTransform = matrix_multiply(centerScale, centerTranslation)
                 self.assetTransform?.columns.3 = focusSquareTransform!.columns.3
+                self.globalTime = 0
             }
         }
     }
@@ -141,6 +144,7 @@ class Renderer {
         gltfBufferAllocator = GLTFMTLBufferAllocator(device: device)
 
         DispatchQueue.global().async {
+            print(device.readWriteTextureSupport)
             if let url = Bundle.main.url(forResource: "art.scnassets/piazza_san_marco", withExtension: "hdr") {
                 let lighting = GLTFMTLLightingEnvironment(contentsOf: url, device: device, error: nil)
                 lighting.intensity = 2.0
@@ -358,10 +362,10 @@ class Renderer {
         anchorPipelineStateDescriptor.colorAttachments[0].isBlendingEnabled = true
         anchorPipelineStateDescriptor.colorAttachments[0].rgbBlendOperation = .add
         anchorPipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = .add
-        anchorPipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = .one
-        anchorPipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .one
-        anchorPipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
-        anchorPipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
+        anchorPipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
+        anchorPipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
+        anchorPipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = .destinationAlpha
+        anchorPipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .destinationAlpha
         anchorPipelineStateDescriptor.depthAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
         anchorPipelineStateDescriptor.stencilAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
         
@@ -397,7 +401,7 @@ class Renderer {
         (vertexDescriptor.attributes[Int(kVertexAttributeNormal.rawValue)] as! MDLVertexAttribute).name   = MDLVertexAttributeNormal
         
         // Use ModelIO to create a box mesh as our object
-        let mesh = MDLMesh(boxWithExtent: vector3(0.075, 0.001, 0.075), segments: vector3(1, 1, 1), inwardNormals: false, geometryType: .triangles, allocator: metalAllocator)
+        let mesh = MDLMesh(boxWithExtent: vector3(0.075, 0.0, 0.075), segments: vector3(1, 1, 1), inwardNormals: false, geometryType: .triangles, allocator: metalAllocator)
         
         // Perform the format/relayout of mesh vertices by setting the new vertex descriptor in our
         //   Model IO mesh
@@ -478,8 +482,12 @@ class Renderer {
         uniforms.pointee.materialShininess = 30
     }
     
-    func updateAnchors(frame: ARFrame) {        
-        anchorInstanceCount = 1 //min(anchors.count, kMaxAnchorInstanceCount)
+    func updateAnchors(frame: ARFrame) {
+        if let _ = gltfAsset {
+            anchorInstanceCount = 0
+            return
+        }
+        anchorInstanceCount = 1
 
         for index in 0..<anchorInstanceCount {
             // Flip Z axis to convert geometry from right handed to left handed

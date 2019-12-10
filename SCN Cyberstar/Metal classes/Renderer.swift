@@ -49,11 +49,11 @@ class Renderer {
     var gltfRenderer: GLTFMTLRenderer!
     var gltfAsset: GLTFAsset? {
         didSet {
-            if let asset = self.gltfAsset {
+            if let asset = self.gltfAsset, let focusTransform = focusSquareTransform {
                 if self.gltfRenderer.lightingEnvironment == nil {
                     let light = GLTFKHRLight()
                     light.type = .ambient
-                    light.intensity = 0.5
+                    light.intensity = 0.75
                     asset.addLight(light)
                     asset.defaultScene?.ambientLight = light
 
@@ -62,17 +62,24 @@ class Renderer {
                     node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
                     let dir = GLTFKHRLight()
                     dir.type = .directional
+                    dir.intensity = 2.0
                     node.light = dir
                     asset.defaultScene?.addNode(node)
                     asset.addLight(dir)
                 }
 
                 let bounds = GLTFBoundingSphereFromBox(asset.defaultScene!.approximateBounds)
-                let scale = bounds.radius > 0 ? 0.5/bounds.radius : 0.5
-                let centerScale = GLTFMatrixFromUniformScale(scale)
-                let centerTranslation = GLTFMatrixFromTranslation(-bounds.center)
-                self.assetTransform = matrix_multiply(centerScale, centerTranslation)
-                self.assetTransform?.columns.3 = focusSquareTransform!.columns.3
+                if let frameMatrix = session.currentFrame?.camera.transform {
+                    let cameraPosition = simd_float3(frameMatrix.columns.3.x, frameMatrix.columns.3.y, frameMatrix.columns.3.z)
+                    let focusPosition = simd_float3(focusTransform.columns.3.x, focusTransform.columns.3.y, focusTransform.columns.3.z)
+                    let distance = cameraPosition.distance(to: focusPosition)
+                    
+                    let scale = bounds.radius > 0 ? 0.5/bounds.radius : 0.5
+                    let centerScale = GLTFMatrixFromUniformScale(scale * distance)
+                    let centerTranslation = GLTFMatrixFromTranslation(-bounds.center)
+                    self.assetTransform = matrix_multiply(centerScale, centerTranslation)
+                }
+                self.assetTransform?.columns.3 = focusTransform.columns.3
                 self.globalTime = 0
             }
         }

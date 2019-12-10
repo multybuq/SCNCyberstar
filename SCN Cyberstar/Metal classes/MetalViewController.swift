@@ -145,7 +145,7 @@ extension MetalViewController {
     }
     
     @IBAction func loadHand() {
-        if let modelUrl = Bundle.main.url(forResource: "art.scnassets/trump", withExtension: "glb") {
+        if let modelUrl = Bundle.main.url(forResource: "art.scnassets/Mone", withExtension: "glb") {
             loadModel(url: modelUrl)
         }
     }

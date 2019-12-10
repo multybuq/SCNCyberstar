@@ -7,7 +7,6 @@
 //
 
 import Foundation
-//import GLTFMTL
 
 extension Renderer {
     func pause() {

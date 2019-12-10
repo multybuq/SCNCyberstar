@@ -3,5 +3,5 @@
 //
 
 #import "ShaderTypes.h"
-#import "GLTFMTL.h"
+//#import "GLTFMTL.h"
 //#import "GLTF.h"

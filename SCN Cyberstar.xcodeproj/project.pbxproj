@@ -29,8 +29,6 @@
 		6383CE132385D99B00A69B08 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6383CE122385D99B00A69B08 /* Node.swift */; };
 		63B0F2E9239BF9A900196029 /* MTKViewRecordable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B0F2E8239BF9A900196029 /* MTKViewRecordable.swift */; };
 		63B0F2EB239BFBF200196029 /* Renderer+Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B0F2EA239BFBF200196029 /* Renderer+Animations.swift */; };
-		63B0F332239ECF8200196029 /* GLTFMTL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63B0F331239ECF8200196029 /* GLTFMTL.framework */; };
-		63B0F333239ECF8200196029 /* GLTFMTL.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 63B0F331239ECF8200196029 /* GLTFMTL.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63B81798238D959B006846C8 /* MetalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B81797238D959B006846C8 /* MetalViewController.swift */; };
 		63B8179D238D9684006846C8 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B8179A238D9684006846C8 /* Renderer.swift */; };
 		63B8179E238D9684006846C8 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 63B8179B238D9684006846C8 /* Shaders.metal */; };
@@ -52,7 +50,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				6383CE102385D40100A69B08 /* GLTFSCN.framework in Embed Frameworks */,
-				63B0F333239ECF8200196029 /* GLTFMTL.framework in Embed Frameworks */,
 				63CB27122398165300C78DC7 /* GLTF.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -85,7 +82,6 @@
 		6383CE122385D99B00A69B08 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		63B0F2E8239BF9A900196029 /* MTKViewRecordable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTKViewRecordable.swift; sourceTree = "<group>"; };
 		63B0F2EA239BFBF200196029 /* Renderer+Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Renderer+Animations.swift"; sourceTree = "<group>"; };
-		63B0F331239ECF8200196029 /* GLTFMTL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GLTFMTL.framework; sourceTree = "<group>"; };
 		63B81797238D959B006846C8 /* MetalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalViewController.swift; sourceTree = "<group>"; };
 		63B8179A238D9684006846C8 /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		63B8179B238D9684006846C8 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
@@ -112,7 +108,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6383CE0F2385D40100A69B08 /* GLTFSCN.framework in Frameworks */,
-				63B0F332239ECF8200196029 /* GLTFMTL.framework in Frameworks */,
 				63CB27112398165300C78DC7 /* GLTF.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -175,7 +170,6 @@
 		6383CE0A2385D40100A69B08 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				63B0F331239ECF8200196029 /* GLTFMTL.framework */,
 				6383CE0B2385D40100A69B08 /* GLTF.framework */,
 				6383CE0C2385D40100A69B08 /* GLTFSCN.framework */,
 			);

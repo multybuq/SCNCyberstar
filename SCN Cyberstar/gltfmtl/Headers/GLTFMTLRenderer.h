@@ -43,12 +43,6 @@ NS_ASSUME_NONNULL_BEGIN
       commandBuffer:(id<MTLCommandBuffer>)commandBuffer
      commandEncoder:(id<MTLRenderCommandEncoder>)renderEncoder;
 
-- (void)renderScene:(GLTFScene *)scene
-      commandBuffer:(id<MTLCommandBuffer>)commandBuffer
-     commandEncoder:(id<MTLRenderCommandEncoder>)renderEncoder
-    pipeline:(id<MTLRenderPipelineState>)pipeline;
-
-
 - (void)signalFrameCompletion;
 
 @end

@@ -160,7 +160,7 @@
     [shaderFeatures appendFormat:@"#define HAS_TEXTURE_TRANSFORM %d\n", hasTextureTransforms];
     [shaderFeatures appendFormat:@"#define PREMULTIPLY_BASE_COLOR %d\n", premultiplyBaseColor];
     [shaderFeatures appendFormat:@"#define MATERIAL_IS_UNLIT %d\n", materialIsUnlit];
-    [shaderFeatures appendFormat:@"#define SPECULAR_ENV_MIP_LEVELS %d\n", lightingEnvironment.specularMipLevelCount];
+    [shaderFeatures appendFormat:@"#define SPECULAR_ENV_MIP_LEVELS %d\n", 6];// lightingEnvironment.specularMipLevelCount];
     [shaderFeatures appendFormat:@"#define MAX_LIGHTS %d\n", (int)GLTFMTLMaximumLightCount];
     [shaderFeatures appendFormat:@"#define MAX_MATERIAL_TEXTURES %d\n\n", (int)GLTFMTLMaximumTextureCount];
 

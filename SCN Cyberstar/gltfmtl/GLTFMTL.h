@@ -28,9 +28,9 @@ FOUNDATION_EXPORT double GLTFMTLVersionNumber;
 //! Project version string for GLTFMTL.
 FOUNDATION_EXPORT const unsigned char GLTFMTLVersionString[];
 
-#import <GLTFMTL/GLTFMTLBufferAllocator.h>
-#import <GLTFMTL/GLTFMTLTextureLoader.h>
-#import <GLTFMTL/GLTFMTLLightingEnvironment.h>
-#import <GLTFMTL/GLTFMTLRenderer.h>
-#import <GLTFMTL/GLTFMTLShaderBuilder.h>
-#import <GLTFMTL/GLTFMTLUtilities.h>
+#import "GLTFMTLBufferAllocator.h"
+#import "GLTFMTLTextureLoader.h"
+#import "GLTFMTLLightingEnvironment.h"
+#import "GLTFMTLRenderer.h"
+#import "GLTFMTLShaderBuilder.h"
+#import "GLTFMTLUtilities.h"

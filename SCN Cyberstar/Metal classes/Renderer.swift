@@ -11,7 +11,7 @@ import Metal
 import MetalKit
 import ARKit
 import GLTF
-import GLTFMTL
+//import GLTFMTL
 
 protocol RenderDestinationProvider {
     var currentRenderPassDescriptor: MTLRenderPassDescriptor? { get }
@@ -144,11 +144,12 @@ class Renderer {
         gltfBufferAllocator = GLTFMTLBufferAllocator(device: device)
 
         DispatchQueue.global().async {
-            print(device.readWriteTextureSupport)
-            if let url = Bundle.main.url(forResource: "art.scnassets/piazza_san_marco", withExtension: "hdr") {
-                let lighting = GLTFMTLLightingEnvironment(contentsOf: url, device: device, error: nil)
-                lighting.intensity = 2.0
-                self.gltfRenderer.lightingEnvironment = lighting
+            if device.readWriteTextureSupport != .tierNone {
+                if let url = Bundle.main.url(forResource: "art.scnassets/piazza_san_marco", withExtension: "hdr") {
+                    let lighting = GLTFMTLLightingEnvironment(contentsOf: url, device: device, error: nil)
+                    lighting.intensity = 2.0
+                    self.gltfRenderer.lightingEnvironment = lighting
+                }
             }
         }
     }

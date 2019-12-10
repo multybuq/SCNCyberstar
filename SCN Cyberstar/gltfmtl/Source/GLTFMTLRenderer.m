@@ -271,7 +271,6 @@ typedef struct {
     
     for (GLTFNode *rootNode in scene.nodes) {
         simd_float4x4 matrix = matrix_identity_float4x4;
-        matrix.columns[3].z = -4;
         [self buildRenderListRecursive:rootNode modelMatrix:matrix];
     }
     
@@ -369,7 +368,6 @@ typedef struct {
                      modelMatrix:(simd_float4x4)modelMatrix
 {
     modelMatrix = matrix_multiply(modelMatrix, node.localTransform);
-
     GLTFMesh *mesh = node.mesh;
     if (mesh) {
         for (GLTFSubmesh *submesh in mesh.submeshes) {

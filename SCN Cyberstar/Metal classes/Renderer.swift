@@ -61,6 +61,7 @@ class Renderer {
                     node.translation = simd_float3(0, 0, 1)
                     node.rotationQuaternion = simd_quaternion(1.0, 0, 0, 0)
                     let dir = GLTFKHRLight()
+                    dir.type = .directional
                     node.light = dir
                     asset.defaultScene?.addNode(node)
                     asset.addLight(dir)
@@ -131,7 +132,7 @@ class Renderer {
     
     private var globalTime: TimeInterval = 0.0
     private var assetTransform: simd_float4x4?
-    
+
     init(session: ARSession, metalDevice device: MTLDevice, renderDestination: RenderDestinationProvider) {
         self.session = session
         self.device = device
@@ -142,7 +143,7 @@ class Renderer {
         gltfRenderer.colorPixelFormat = .bgra8Unorm
         gltfRenderer.depthStencilPixelFormat = .depth32Float_stencil8
         gltfBufferAllocator = GLTFMTLBufferAllocator(device: device)
-
+        
         DispatchQueue.global().async {
             if device.readWriteTextureSupport != .tierNone {
                 if let url = Bundle.main.url(forResource: "art.scnassets/piazza_san_marco", withExtension: "hdr") {
@@ -161,7 +162,7 @@ class Renderer {
     }
     
     func update() {
-        updateAnimations(timestep: timestep)
+       updateAnimations(timestep: timestep)
        
         // Wait to ensure only kMaxBuffersInFlight are getting proccessed by any stage in the Metal
         //   pipeline (App, Metal, Drivers, GPU, etc)

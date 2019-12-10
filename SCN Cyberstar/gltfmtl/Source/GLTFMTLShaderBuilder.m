@@ -38,63 +38,107 @@
     id<MTLLibrary> library;
     
     if (shaderSource) {
-        shaderSource = [self rewriteSource:shaderSource forSubmesh:submesh lightingEnvironment:lightingEnvironment];
+        BOOL pbr = ![device.name containsString:@"A9"];
+        shaderSource = [self rewriteSource:shaderSource forSubmesh:submesh lightingEnvironment:lightingEnvironment usePbr:pbr];
         library = [device newLibraryWithSource:shaderSource options:nil error:&error];
+        
+        if (!library) {
+            NSLog(@"Error occurred while creating library for material : %@", error);
+            return nil;
+        }
+
+        id <MTLFunction> vertexFunction = nil;
+        id <MTLFunction> fragmentFunction = nil;
+
+        for (NSString *functionName in [library functionNames]) {
+            id<MTLFunction> function = [library newFunctionWithName:functionName];
+            if ([function functionType] == MTLFunctionTypeVertex) {
+                vertexFunction = function;
+            } else if ([function functionType] == MTLFunctionTypeFragment) {
+                fragmentFunction = function;
+            }
+        }
+        
+        if (!vertexFunction || !fragmentFunction) {
+            NSLog(@"Failed to find a vertex and fragment function in library source");
+            return nil;
+        }
+        
+        MTLVertexDescriptor *vertexDescriptor = [self vertexDescriptorForSubmesh: submesh];
+
+        MTLRenderPipelineDescriptor *pipelineDescriptor = [MTLRenderPipelineDescriptor new];
+        pipelineDescriptor.vertexFunction = vertexFunction;
+        pipelineDescriptor.fragmentFunction = fragmentFunction;
+        pipelineDescriptor.vertexDescriptor = vertexDescriptor;
+        
+        pipelineDescriptor.colorAttachments[0].pixelFormat = colorPixelFormat;
+        pipelineDescriptor.sampleCount = sampleCount;
+
+        if (submesh.material.alphaMode == GLTFAlphaModeBlend) {
+            pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
+            pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
+            pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+            pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorOne;
+            pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
+            pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+            pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+        }
+
+        pipelineDescriptor.depthAttachmentPixelFormat = depthStencilPixelFormat;
+        pipelineDescriptor.stencilAttachmentPixelFormat = depthStencilPixelFormat;
+        
+        id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:pipelineDescriptor error:&error];
+        if (!pipeline) {
+            NSLog(@"Error occurred when creating render pipeline state: %@", error);
+        }
+        
+        return pipeline;
     } else {
         library = [device newDefaultLibrary];
-    }
-    
-    if (!library) {
-        NSLog(@"Error occurred while creating library for material : %@", error);
-        return nil;
-    }
-
-    id <MTLFunction> vertexFunction = nil;
-    id <MTLFunction> fragmentFunction = nil;
-
-    for (NSString *functionName in [library functionNames]) {
-        id<MTLFunction> function = [library newFunctionWithName:functionName];
-        if ([function functionType] == MTLFunctionTypeVertex) {
-            vertexFunction = function;
-        } else if ([function functionType] == MTLFunctionTypeFragment) {
-            fragmentFunction = function;
+        
+        if (!library) {
+            NSLog(@"Error occurred while creating library for material : %@", error);
+            return nil;
         }
-    }
-    
-    if (!vertexFunction || !fragmentFunction) {
-        NSLog(@"Failed to find a vertex and fragment function in library source");
-        return nil;
-    }
-    
-    MTLVertexDescriptor *vertexDescriptor = [self vertexDescriptorForSubmesh: submesh];
 
-    MTLRenderPipelineDescriptor *pipelineDescriptor = [MTLRenderPipelineDescriptor new];
-    pipelineDescriptor.vertexFunction = vertexFunction;
-    pipelineDescriptor.fragmentFunction = fragmentFunction;
-    pipelineDescriptor.vertexDescriptor = vertexDescriptor;
-    
-    pipelineDescriptor.colorAttachments[0].pixelFormat = colorPixelFormat;
-    pipelineDescriptor.sampleCount = sampleCount;
+        id <MTLFunction> vertexFunction = [library newFunctionWithName:@"blinnPhongVertex"];
+        id <MTLFunction> fragmentFunction = [library newFunctionWithName:@"blinnPhongFragment"];
+        
+        if (!vertexFunction || !fragmentFunction) {
+            NSLog(@"Failed to find a vertex and fragment function in library source");
+            return nil;
+        }
+        
+        MTLVertexDescriptor *vertexDescriptor = [self vertexDescriptorForSubmesh: submesh];
 
-    if (submesh.material.alphaMode == GLTFAlphaModeBlend) {
-        pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
-        pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
-        pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
-        pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorOne;
-        pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
-        pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-        pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-    }
+        MTLRenderPipelineDescriptor *pipelineDescriptor = [MTLRenderPipelineDescriptor new];
+        pipelineDescriptor.vertexFunction = vertexFunction;
+        pipelineDescriptor.fragmentFunction = fragmentFunction;
+        pipelineDescriptor.vertexDescriptor = vertexDescriptor;
+        
+        pipelineDescriptor.colorAttachments[0].pixelFormat = colorPixelFormat;
+        pipelineDescriptor.sampleCount = sampleCount;
 
-    pipelineDescriptor.depthAttachmentPixelFormat = depthStencilPixelFormat;
-    pipelineDescriptor.stencilAttachmentPixelFormat = depthStencilPixelFormat;
-    
-    id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:pipelineDescriptor error:&error];
-    if (!pipeline) {
-        NSLog(@"Error occurred when creating render pipeline state: %@", error);
+        if (submesh.material.alphaMode == GLTFAlphaModeBlend) {
+            pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
+            pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
+            pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+            pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+            pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
+            pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+            pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+        }
+
+        pipelineDescriptor.depthAttachmentPixelFormat = depthStencilPixelFormat;
+        pipelineDescriptor.stencilAttachmentPixelFormat = depthStencilPixelFormat;
+        
+        id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:pipelineDescriptor error:&error];
+        if (!pipeline) {
+            NSLog(@"Error occurred when creating render pipeline state: %@", error);
+        }
+        
+        return pipeline;
     }
-    
-    return pipeline;
 }
 
 - (NSString *)shaderSource {
@@ -109,10 +153,11 @@
 - (NSString *)rewriteSource:(NSString *)source
                  forSubmesh:(GLTFSubmesh *)submesh
         lightingEnvironment:(GLTFMTLLightingEnvironment *)lightingEnvironment
+                     usePbr:(BOOL)pbr
 {
     GLTFMaterial *material = submesh.material;
     
-    BOOL usePBR = YES;
+    BOOL usePBR = pbr;
     BOOL useIBL = lightingEnvironment != nil;
     BOOL useDoubleSided = material.isDoubleSided;
     BOOL hasTexCoord0 = submesh.accessorsForAttributes[GLTFAttributeSemanticTexCoord0] != nil;
@@ -160,7 +205,7 @@
     [shaderFeatures appendFormat:@"#define HAS_TEXTURE_TRANSFORM %d\n", hasTextureTransforms];
     [shaderFeatures appendFormat:@"#define PREMULTIPLY_BASE_COLOR %d\n", premultiplyBaseColor];
     [shaderFeatures appendFormat:@"#define MATERIAL_IS_UNLIT %d\n", materialIsUnlit];
-    [shaderFeatures appendFormat:@"#define SPECULAR_ENV_MIP_LEVELS %d\n", 6];// lightingEnvironment.specularMipLevelCount];
+    [shaderFeatures appendFormat:@"#define SPECULAR_ENV_MIP_LEVELS %d\n", lightingEnvironment.specularMipLevelCount];
     [shaderFeatures appendFormat:@"#define MAX_LIGHTS %d\n", (int)GLTFMTLMaximumLightCount];
     [shaderFeatures appendFormat:@"#define MAX_MATERIAL_TEXTURES %d\n\n", (int)GLTFMTLMaximumTextureCount];
 

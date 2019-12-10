@@ -29,6 +29,7 @@
 		6383CE132385D99B00A69B08 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6383CE122385D99B00A69B08 /* Node.swift */; };
 		63B0F2E9239BF9A900196029 /* MTKViewRecordable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B0F2E8239BF9A900196029 /* MTKViewRecordable.swift */; };
 		63B0F2EB239BFBF200196029 /* Renderer+Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B0F2EA239BFBF200196029 /* Renderer+Animations.swift */; };
+		63B0F335239F8F8A00196029 /* BlinnPhong.metal in Sources */ = {isa = PBXBuildFile; fileRef = 63B0F334239F8F8A00196029 /* BlinnPhong.metal */; };
 		63B81798238D959B006846C8 /* MetalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B81797238D959B006846C8 /* MetalViewController.swift */; };
 		63B8179D238D9684006846C8 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B8179A238D9684006846C8 /* Renderer.swift */; };
 		63B8179E238D9684006846C8 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 63B8179B238D9684006846C8 /* Shaders.metal */; };
@@ -82,6 +83,7 @@
 		6383CE122385D99B00A69B08 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		63B0F2E8239BF9A900196029 /* MTKViewRecordable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTKViewRecordable.swift; sourceTree = "<group>"; };
 		63B0F2EA239BFBF200196029 /* Renderer+Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Renderer+Animations.swift"; sourceTree = "<group>"; };
+		63B0F334239F8F8A00196029 /* BlinnPhong.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = BlinnPhong.metal; sourceTree = "<group>"; };
 		63B81797238D959B006846C8 /* MetalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalViewController.swift; sourceTree = "<group>"; };
 		63B8179A238D9684006846C8 /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		63B8179B238D9684006846C8 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
@@ -187,6 +189,7 @@
 				63B8179B238D9684006846C8 /* Shaders.metal */,
 				63B81797238D959B006846C8 /* MetalViewController.swift */,
 				63B8179F238D9874006846C8 /* ShaderTypes.h */,
+				63B0F334239F8F8A00196029 /* BlinnPhong.metal */,
 			);
 			path = "Metal classes";
 			sourceTree = "<group>";
@@ -301,6 +304,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63B0F335239F8F8A00196029 /* BlinnPhong.metal in Sources */,
 				63B817D3238EECD8006846C8 /* GLTFMTLLightingEnvironment.m in Sources */,
 				631510832397B064007C5425 /* skybox.metal in Sources */,
 				63B0F2E9239BF9A900196029 /* MTKViewRecordable.swift in Sources */,

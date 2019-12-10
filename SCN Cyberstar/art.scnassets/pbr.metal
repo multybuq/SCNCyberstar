@@ -365,25 +365,25 @@ fragment half4 fragment_main(VertexOut in [[stage_in]],
 
         for (int i = 0; i < MAX_LIGHTS; ++i) {
             Light light = uniforms.lights[i];
-            
+
             float3 L = normalize((light.position.w == 0) ? -light.position.xyz : (light.position.xyz - in.worldPosition));
             float3 H = normalize(L + V);
 
             float NdotL = saturate(dot(N, L));
             float NdotH = saturate(dot(N, H));
             float VdotH = saturate(dot(V, H));
-            
+
             half3 F = SchlickFresnel(F0, VdotH);
             float G = SmithGeometric(NdotL, NdotV, alphaRoughness);
             float D = TrowbridgeReitzNDF(NdotH, alphaRoughness);
-            
+
             half3 diffuseContrib(0);
             half3 specContrib(0);
             if (NdotL > 0) {
                 diffuseContrib = NdotL * LambertDiffuse(diffuseColor);
                 specContrib = NdotL * D * F * G / (4.0 * NdotL * NdotV);
             }
-            
+
             half lightDist = length(light.position.xyz - in.worldPosition);
             half attenNum = (light.range > 0) ? saturate(1.0 - powr(lightDist / light.range, 4)) : 1;
             half atten = (light.position.w == 0) ? 1 : attenNum / powr(lightDist, 2);
@@ -394,6 +394,34 @@ fragment half4 fragment_main(VertexOut in [[stage_in]],
             atten *= spotAtten;
 
             color += half3(light.color.rgb * light.intensity) * atten * (diffuseContrib + specContrib);
+        }
+    #else
+        color += half3(uniforms.ambientLight.color.rgb * uniforms.ambientLight.intensity) * diffuseColor;
+
+        for (int i = 0; i < MAX_LIGHTS; ++i) {
+            Light light = uniforms.lights[i];
+
+            float3 L = normalize((light.position.w == 0) ? -light.position.xyz : (light.position.xyz - in.worldPosition));
+            float3 H = normalize(L + V);
+
+            float NdotL = saturate(dot(N, L));
+            float NdotH = saturate(dot(N, H));
+            float VdotH = saturate(dot(V, H));
+
+            half3 F = SchlickFresnel(F0, VdotH);
+            float G = SmithGeometric(NdotL, NdotV, alphaRoughness);
+            float D = TrowbridgeReitzNDF(NdotH, alphaRoughness);
+
+            half3 diffuseContrib(0);
+            if (NdotL > 0) {
+                diffuseContrib = NdotL * LambertDiffuse(diffuseColor);
+            }
+
+            half lightDist = length(light.position.xyz - in.worldPosition);
+            half attenNum = (light.range > 0) ? saturate(1.0 - powr(lightDist / light.range, 4)) : 1;
+            half atten = (light.position.w == 0) ? 1 : attenNum / powr(lightDist, 2);
+            
+            color += half3(light.color.rgb * light.intensity) * atten * diffuseContrib;
         }
     #endif
 

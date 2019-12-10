@@ -11,7 +11,7 @@ import Metal
 import MetalKit
 import ARKit
 import GLTF
-//import GLTFMTL
+import GLTFMTL
 
 protocol RenderDestinationProvider {
     var currentRenderPassDescriptor: MTLRenderPassDescriptor? { get }

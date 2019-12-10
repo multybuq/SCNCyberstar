@@ -10,7 +10,7 @@ import UIKit
 import Metal
 import MetalKit
 import ARKit
-//import GLTFMTL
+import GLTFMTL
 
 extension MTKView : RenderDestinationProvider {
 }
